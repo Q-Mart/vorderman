@@ -7,6 +7,9 @@ def children(state):
 
     return kids
 
+def atGoal(state):
+    return state in words
+
 with open('dict.txt', 'r') as f:
     wordsFromFile = list(map(str.strip ,f.readlines()))
 
@@ -24,6 +27,8 @@ for w in wordsFromFile:
 letters = input("Please enter a the letters:")
 reversedLetters = ''.join(sorted(letters))
 
-kids = children(reversedLetters)
-print(kids)
-print(len(kids))
+searcher = bfs.BFS(reversedLetters, atGoal, children)
+result = searcher.search()
+
+print(result)
+print(words[result])

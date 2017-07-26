@@ -11,7 +11,7 @@ class BFS():
         self.__childrenFunc = childrenFunc
 
         self.__q = queue.Queue(maxsize=2**19)
-        self.__visted = [self.__currentState]
+        self.__visited = [self.__currentState]
 
     def __atGoal(self):
         return self.__goalFunc(self.__currentState)
@@ -20,9 +20,9 @@ class BFS():
         return self.__childrenFunc(self.__currentState)
 
     def search(self):
-        while not self.__atGoal(currentState):
+        while not self.__atGoal():
             self.__visited.append(self.__currentState)
-            for child in self.__children:
+            for child in self.__children():
                 if child in self.__visited:
                     continue
                 else:
