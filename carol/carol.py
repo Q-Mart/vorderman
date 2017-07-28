@@ -28,7 +28,7 @@ letters = input("Please enter a the letters:")
 reversedLetters = ''.join(sorted(letters))
 
 searcher = bfs.BFS(reversedLetters, atGoal, children)
-result = searcher.search()
+result = searcher.executeSearch()
 
 print(result)
 print(words[result])

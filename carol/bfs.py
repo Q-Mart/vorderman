@@ -1,33 +1,27 @@
+import search
 import queue
 
-class BFS():
+class BFS(search.SearchAlgorithm):
 
     def __init__(self,
                  start,
                  goalFunc,
                  childrenFunc):
-        self.__currentState = start
-        self.__goalFunc = goalFunc
-        self.__childrenFunc = childrenFunc
-
+        search.SearchAlgorithm.__init__(self,
+                                        start,
+                                        goalFunc,
+                                        childrenFunc)
         self.__q = queue.Queue(maxsize=2**19)
-        self.__visited = [self.__currentState]
 
-    def __atGoal(self):
-        return self.__goalFunc(self.__currentState)
-
-    def __children(self):
-        return self.__childrenFunc(self.__currentState)
-
-    def search(self):
-        while not self.__atGoal():
-            self.__visited.append(self.__currentState)
-            for child in self.__children():
-                if child in self.__visited:
+    def executeSearch(self):
+        while not self._atGoal():
+            self._visited.append(self._currentState)
+            for child in self._children():
+                if child in self._visited:
                     continue
                 else:
                     self.__q.put(child)
 
-            self.__currentState = self.__q.get()
+            self._currentState = self.__q.get()
 
-        return self.__currentState
+        return self._currentState
