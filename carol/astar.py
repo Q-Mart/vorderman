@@ -19,7 +19,7 @@ class Astar(search.SearchAlgorithm):
         self.__previous = {self._currentState: None}
 
         f = self.__f(self._currentState)
-        frontier = [(f, self._currentState)]
+        self.__frontier = [(f, self._currentState)]
 
     def __g(self):
         return self.__gFunc(self._currentState)
@@ -33,17 +33,17 @@ class Astar(search.SearchAlgorithm):
         s = self._currentState
 
     def executeSearch(self):
-        while frontier:
-            self._currentState = heapq.heappop(frontier)
+        while self.__frontier:
+            self._currentState = heapq.heappop(self.__frontier)[1]
             self._visited.append(self._currentState)
 
-            if self._atGoal(self._currentState):
+            if self._atGoal():
                return self.__path() 
 
             for child in self._children():
-                if child in visited:
+                if child in self._visited:
                     continue
 
                 self.__previous[child] = self._currentState
                 f = self.__f(child)
-                self.__frontier.heappush((f, child))
+                heapq.heappush(self.__frontier, (f, child))
