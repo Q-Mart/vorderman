@@ -24,11 +24,12 @@ for w in wordsFromFile:
     else:
         words[sortedW] = [w]
 
-letters = input("Please enter a the letters:")
+letters = input("Please enter all the letters: ")
 reversedLetters = ''.join(sorted(letters))
 
 searcher = bfs.BFS(reversedLetters, atGoal, children)
 result = searcher.executeSearch()
 
 print(result)
+print("Length: " + str(len(result)))
 print(words[result])
