@@ -1,33 +1,88 @@
-import astar
+import itertools
 import collections
-import operator
 
-State = collections.namedtuple('State', ['currentVal', 'numbersLeft', 'lastOperation'])
+class Node:
+    def __init__(self, value):
+        self.value = value
+        self.children = collections.defaultdict(list)
 
-def solveNumbersRound(goal, numbers):
 
-    goalFunc = lambda x: x.currentVal == goal
-    hFunc = lambda x: goal - x.currentVal
-    gFunc = hFunc
+def allResultsFrom(a,b):
+    yield '+', a + b
+    yield 'x', a * b
 
-    def children(s):
-        operators = [('+', operator.add),
-                     ('-', operator.sub),
-                     ('*', operator.mul),
-                     ('/', operator.truediv)]
-        kids = []
-        for n in s.numbersLeft:
-            for ch, op in operators:
-                i = s.numbersLeft.index(n)
-                newNumbersLeft = s.numbersLeft[i+1:] + s.numbersLeft[:i]
-                newCurrentVal = op(s.currentVal, n)
+    c = b-a
+    if c > 0:
+        yield '-', c
+    if b % a == 0:
+        yield '/', b / a
 
-                kids.append(State(newCurrentVal, newNumbersLeft, ch))
+def pairsAndRejects(numbers):
+    for pair in itertools.combinations(numbers, 2):
 
-        return kids
+        pair = tuple(sorted(pair))
 
-    searcher = astar.Astar(State(0, numbers, None), goalFunc, children, hFunc, gFunc)
-    return searcher.executeSearch()
+        # We don't want to modify the original list
+        rejects = list(numbers[:])
+        del rejects[rejects.index(pair[0])]
+        del rejects[rejects.index(pair[1])]
 
-r = solveNumbersRound(386.0, (25, 75, 50, 1, 9, 3))
-print(r)
+        yield pair, rejects
+
+def generateTree(numbers, target, t=None):
+    if t==None: t=Node(tuple(sorted(numbers)))
+    # base case
+    if len(numbers) == 1: return t
+    if target in numbers: return t
+
+    for pair, rejects in pairsAndRejects(numbers):
+        a, b = pair[0], pair[1]
+        for op, c in allResultsFrom(a,b):
+            newNumbers = tuple(sorted(rejects + [c]))
+            newNode = Node(newNumbers)
+            if op in ['+', '*']:
+                t.children[newNode].append(str(a) + op + str(b))
+            else:
+                t.children[newNode].append(str(b) + op + str(a))
+
+        for child in t.children.keys():
+            generateTree(child.value, target, child)
+
+    return t
+
+def findPath(target, root):
+    visited = set()
+    stack = [(root, [])]
+
+    while stack:
+        (node, path) = stack.pop()
+        # print (node.value, path)
+        if node.value == [15, 50]:
+            for c, op in node.children.items():
+                print(node.value, c.value, op)
+
+        if node not in visited:
+            if target in node.value:
+                return path
+            visited.add(node)
+
+            for child, operations in node.children.items():
+                stack.append((child, path + [operations[0]]))
+
+
+def prettyPrint(root):
+    print (root.value)
+    for child in root.children.keys():
+        print ('\t', prettyPrint(child))
+
+# nums = [5, 100, 25]
+# t = 125
+
+# nums = [25, 5, 3, 2]
+# t = 750
+
+nums = [3, 6, 25, 50, 75, 100]
+t = 952
+
+g = generateTree(nums, t)
+print (findPath(t, g))
