@@ -32,8 +32,9 @@ def pairsAndRejects(numbers):
 def generateTree(numbers, target, t=None):
     if t==None: t=Node(tuple(sorted(numbers)))
     # base case
-    if len(numbers) == 1: return t
-    if target in numbers: return t
+    if target in numbers:
+        return (t, True)
+    if len(numbers) == 1: return (t, False)
 
     for pair, rejects in pairsAndRejects(numbers):
         a, b = pair[0], pair[1]
@@ -46,9 +47,10 @@ def generateTree(numbers, target, t=None):
                 t.children[newNode].append(str(b) + op + str(a))
 
         for child in t.children.keys():
-            generateTree(child.value, target, child)
+            _, finished = generateTree(child.value, target, child)
+            if finished: return (t, True)
 
-    return t
+    return (t, False)
 
 def findPath(target, root):
     visited = set()
@@ -56,10 +58,6 @@ def findPath(target, root):
 
     while stack:
         (node, path) = stack.pop()
-        # print (node.value, path)
-        if node.value == [15, 50]:
-            for c, op in node.children.items():
-                print(node.value, c.value, op)
 
         if node not in visited:
             if target in node.value:
@@ -81,8 +79,11 @@ def prettyPrint(root):
 # nums = [25, 5, 3, 2]
 # t = 750
 
+# nums = [25, 75, 50, 1, 9, 3]
+# t = 386
+
 nums = [3, 6, 25, 50, 75, 100]
 t = 952
 
-g = generateTree(nums, t)
+g, _ = generateTree(nums, t)
 print (findPath(t, g))
