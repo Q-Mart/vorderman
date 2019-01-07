@@ -4,3 +4,7 @@ services:
     build: .
   redis:
     image: redis:alpine
+    command: redis-server /usr/local/etc/redis/redis.conf
+    volumes:
+      - ./conf/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./data:/data
