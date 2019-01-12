@@ -82,8 +82,11 @@ def prettyPrint(root):
 # nums = [25, 75, 50, 1, 9, 3]
 # t = 386
 
-nums = [3, 6, 25, 50, 75, 100]
-t = 952
+nums = [25, 75, 3, 7, 4, 2]
+t = 644
+
+# nums = [3, 6, 25, 50, 75, 100]
+# t = 952
 
 g, _ = generateTree(nums, t)
 print (findPath(t, g))
