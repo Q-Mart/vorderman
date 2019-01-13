@@ -1,5 +1,5 @@
-carol/conf/redis.conf
-carol/conf/password
+vorderman/conf/redis.conf
+vorderman/conf/password
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
