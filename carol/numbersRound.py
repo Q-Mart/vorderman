@@ -27,9 +27,18 @@ def generateTree(numbers, target):
     numbers = tuple(sorted(numbers))
     graph = collections.defaultdict(list)
 
+    finished = False
     # node represented in dict as ('operation to get here', list of numbers)
     def r(node):
+        nonlocal finished
+
+        if finished:
+            return
+
         numbers = node[1]
+        if target in numbers:
+            finished = True
+
         for pair, rejects in pairsAndRejects(numbers):
             a,b = pair[0], pair[1]
             for op, c in allResultsFrom(a, b):

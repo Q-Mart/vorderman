@@ -1,14 +1,14 @@
-from flask import Flask, jsonify
-
-import re
+from flask import Flask, jsonify, request
 
 import lettersRound
 import numbersRound
 
 app = Flask(__name__)
 
-@app.route('/letters/<inputLetters>', methods=['GET'])
-def solve_letters(inputLetters):
+@app.route('/letters', methods=['GET'])
+def solve_letters():
+    inputLetters = request.args.get('input')
+
     if len(inputLetters) > 9:
         result = {'error':
                     {'status': '400',
@@ -26,10 +26,28 @@ def solve_letters(inputLetters):
                   }
     return jsonify(result)
 
-@app.route('/numbers/<numbersAndTarget>', methods=['GET'])
-def solve_numbers(numbersAndTarget):
-    # Input must follow the form ?num=x,x,x,x,x,x?target=x
-    pass
+@app.route('/numbers', methods=['GET'])
+def solve_numbers():
+    numbers = request.args.get('numbers')
+    target = request.args.get('target')
+
+    try:
+        numbers = list(map(int, numbers.split(',')))
+        target = int(target)
+        answer = numbersRound.solve(target, numbers)
+        result = {'error': {'status': '200'},
+                  'data':
+                    {'solutionPath': answer}
+                  }
+        return jsonify(result)
+
+    except Exception:
+        result = {'error':
+                    {'status': '400',
+                     'title': 'Bad Request. Request should be in the formate of numbers?=x,x,x,x,x,x&target=x'}
+                  }
+        return jsonify(result)
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
