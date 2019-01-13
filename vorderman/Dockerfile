@@ -1,5 +1,4 @@
-FROM python:3.4-alpine
-ADD . /code
-WORKDIR /code
+FROM tiangolo/meinheld-gunicorn-flask:python3.7
+COPY . /app
 RUN pip install -r requirements.txt
-CMD ["sh", "start.sh"]
+ENTRYPOINT python initDB.py && /entrypoint.sh
