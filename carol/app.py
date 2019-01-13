@@ -1,13 +1,11 @@
 from flask import Flask, jsonify
 
+import re
+
 import lettersRound
 import numbersRound
 
 app = Flask(__name__)
-
-@app.route('/')
-def index():
-    return "Hello world"
 
 @app.route('/letters/<inputLetters>', methods=['GET'])
 def solve_letters(inputLetters):
@@ -27,6 +25,11 @@ def solve_letters(inputLetters):
                     {'solutions': [sol.decode('utf-8') for sol in lettersRound.solve(inputLetters)]}
                   }
     return jsonify(result)
+
+@app.route('/numbers/<numbersAndTarget>', methods=['GET'])
+def solve_numbers(numbersAndTarget):
+    # Input must follow the form ?num=x,x,x,x,x,x?target=x
+    pass
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)

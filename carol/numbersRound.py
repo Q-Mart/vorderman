@@ -1,12 +1,6 @@
 import itertools
 import collections
 
-class Node:
-    def __init__(self, value):
-        self.value = value
-        self.children = collections.defaultdict(list)
-
-
 def allResultsFrom(a,b):
     yield '+', a + b
     yield 'x', a * b
@@ -29,43 +23,45 @@ def pairsAndRejects(numbers):
 
         yield pair, rejects
 
-def generateTree(numbers, target, t=None):
-    if t==None: t=Node(tuple(sorted(numbers)))
-    # base case
-    if target in numbers:
-        return (t, True)
-    if len(numbers) == 1: return (t, False)
+def generateTree(numbers, target):
+    numbers = tuple(sorted(numbers))
+    graph = collections.defaultdict(list)
 
-    for pair, rejects in pairsAndRejects(numbers):
-        a, b = pair[0], pair[1]
-        for op, c in allResultsFrom(a,b):
-            newNumbers = tuple(sorted(rejects + [c]))
-            newNode = Node(newNumbers)
-            if op in ['+', '*']:
-                t.children[newNode].append(str(a) + op + str(b))
-            else:
-                t.children[newNode].append(str(b) + op + str(a))
+    # node represented in dict as ('operation to get here', list of numbers)
+    def r(node):
+        numbers = node[1]
+        for pair, rejects in pairsAndRejects(numbers):
+            a,b = pair[0], pair[1]
+            for op, c in allResultsFrom(a, b):
+                newNumbers = tuple(sorted(rejects + [c]))
+                if op in ['+', '*']:
+                    newNode = ((str(a) + op + str(b), newNumbers))
+                else:
+                    newNode = ((str(b) + op + str(a), newNumbers))
 
-        for child in t.children.keys():
-            _, finished = generateTree(child.value, target, child)
-            if finished: return (t, True)
+                graph[node].append(newNode)
+                r(newNode)
 
-    return (t, False)
+    r(('', numbers))
+    return graph
 
-def findPath(target, root):
+
+def findPath(target, start, graph):
+    start = ('', tuple(sorted(start)))
+
     visited = set()
-    stack = [(root, [])]
+    stack = [(start, [start])]
 
     while stack:
         (node, path) = stack.pop()
 
-        if node not in visited:
-            if target in node.value:
+        if node[1] not in visited:
+            if target in node[1]:
                 return path
-            visited.add(node)
+            visited.add(node[1])
 
-            for child, operations in node.children.items():
-                stack.append((child, path + [operations[0]]))
+            for c in graph[node]:
+                stack.append((c, path + [c]))
 
 
 def prettyPrint(root):
@@ -73,20 +69,30 @@ def prettyPrint(root):
     for child in root.children.keys():
         print ('\t', prettyPrint(child))
 
-# nums = [5, 100, 25]
-# t = 125
+def printPath(path):
+    for op, nums in path:
+        print (op, '\t', nums)
 
-# nums = [25, 5, 3, 2]
-# t = 750
+def solve(target, numbers):
+    g = generateTree(numbers, target)
+    return findPath(target, numbers, g)
 
-# nums = [25, 75, 50, 1, 9, 3]
-# t = 386
+def test(target, numbers):
+    printPath(solve(target, numbers))
 
-# nums = [25, 75, 3, 7, 4, 2]
-# t = 644
+# Testing
+if __name__ == '__main__':
+    print ('Solving Case 1...')
+    test(125, [5, 100,25])
 
-# nums = [3, 6, 25, 50, 75, 100]
-# t = 952
+    print ('Solving Case 2...')
+    test(750, [25, 5, 3, 2])
 
-# g, _ = generateTree(nums, t)
-# print (findPath(t, g))
+    print ('Solving Case 3...')
+    test(386, [25, 75, 50, 1, 9, 3])
+
+    print ('Solving Case 4...')
+    test(644, [25, 75, 3, 7, 4, 2])
+
+    print ('Solving Case 5...')
+    test(952, [3, 6, 25, 50, 75, 100])
