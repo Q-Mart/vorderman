@@ -1,9 +1,11 @@
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 
 import lettersRound
 import numbersRound
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/letters', methods=['GET'])
 def solve_letters():
