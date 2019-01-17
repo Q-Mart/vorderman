@@ -46,7 +46,7 @@ def solve_numbers():
     except Exception:
         result = {'error':
                     {'status': '400',
-                     'title': 'Bad Request. Request should be in the formate of numbers?=x,x,x,x,x,x&target=x'}
+                     'title': 'Bad Request. Request should be in the format of numbers?=x,x,x,x,x,x&target=x'}
                   }
         return jsonify(result)
 
